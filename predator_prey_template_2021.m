@@ -2,6 +2,8 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
+%comment added
+
 function predator_prey
 
    close all
