@@ -2,6 +2,8 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
+% keller is cool
+
 function predator_prey
 
    close all
