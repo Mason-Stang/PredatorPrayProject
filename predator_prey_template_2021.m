@@ -190,7 +190,7 @@ function [continue_running,initial_w,start_time] = handle_event(event_time,event
 end
     
 %% CHANGE THE NAME OF THE FUNCTION TO A UNIQUE GROUP NAME BEFORE SUBMITTING    
-function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
+function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
 
 
 % PLEASE FILL OUT THE INFORMATION BELOW WHEN YOU SUBMIT YOUR CODE
