@@ -105,13 +105,34 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dErdt = -Eburnrate_r*norm(Fr)^(3/2);
+    dErdt= 0;
 
     % Write similar code below to call your compute_f_groupname function to
     % compute the force on the prey, determine the random forces on the prey,
     % and determine the viscous forces on the prey
 
     amiapredator = false;
+Fy = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fymag = sqrt(dot(Fy,Fy)); % Prevent prey from cheating....
+    if (Fymag>Fymax)
+        Fy=Fy*Fymax/Fymag;
+    end
+    if (Ey<=0)  % Out of fuel!
+        Fy = [0;0];
+    end
 
+    Fyrand = Fyrand_magnitude*compute_random_force(t,force_table_prey); % Random force on predator
+    Fyvisc = -norm(vy)*vy*c;   % Drag force on predator
+    Fygrav = -my*g*[0;1];      % Gravity force on predator
+    Fytotal = Fy+Fyrand+Fyvisc+Fygrav;  % Total force on predator
+
+    %       If predator is on ground and stationary, and resultant vertical force < 0, set force on predator to zero
+    if (py(2)<=0 && vy(2)<=0 && Fytotal(2)<0)
+        Fytotal = [0;0];
+    end
+
+    dEydt = -Eburnrate_y*norm(Fy)^(3/2);
+    dEydt = 0;
 
     dwdt = [vr;vy;Frtotal/mr;Fytotal/my;dErdt;dEydt];
 
@@ -192,7 +213,7 @@ function [continue_running,initial_w,start_time] = handle_event(event_time,event
 end
     
 %% CHANGE THE NAME OF THE FUNCTION TO A UNIQUE GROUP NAME BEFORE SUBMITTING    
-function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
+function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
 
 
 % PLEASE FILL OUT THE INFORMATION BELOW WHEN YOU SUBMIT YOUR CODE
@@ -230,12 +251,23 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
   %
   if (amiapredator)
     % Code to compute the force to be applied to the predator
-
+ %R= c/p(r)
+   dt= 8;
+   if (norm(py-pr) < 15)
+        dt = 2;
+   end
+%     if (t<5)
+%         F= Fymax*[0;1];
+ F= py+dt*vy - (pr+dt*vr);
+ F= Frmax*F/norm(F);
  
   else
     % Code to compute the force to be applied to the prey
-
- 
+     if (t<5)
+    F = Fymax*[0;1];
+      end
+F=[sin(t); 2 + cos(t)];
+F= Fymax*F/norm(F);
    end
   
 end
