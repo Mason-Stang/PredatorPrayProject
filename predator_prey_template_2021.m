@@ -2,10 +2,9 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
-<<<<<<< HEAD
-=======
+
 % keller is cool
->>>>>>> 720022805d4a03c43313a4d5759b54734bcff651
+
 
 function predator_prey
 
@@ -221,7 +220,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
 % PLEASE FILL OUT THE INFORMATION BELOW WHEN YOU SUBMIT YOUR CODE
 % Test time and place: Enter the time and room for your test here 
-% Group members: list the names of your group members here
+% Group members: Mason, Austin, Andrew, keller
 
 
 %   t: Time
@@ -253,10 +252,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
-<<<<<<< HEAD
-    
 
-=======
     %R= c/p(r)
         dt= 8;
         if (norm(py-pr) < 15)
@@ -266,7 +262,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 %         F= Fymax*[0;1];
     F= py+dt*vy - (pr+dt*vr);
     F= Frmax*F/norm(F);
->>>>>>> 720022805d4a03c43313a4d5759b54734bcff651
+
  
     else
     % Code to compute the force to be applied to the prey
