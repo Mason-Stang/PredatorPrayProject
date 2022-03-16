@@ -85,7 +85,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
 
     % Compute all the forces on the predator
     amiapredator = true;
-    Fr = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fr = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
     Frmag = sqrt(dot(Fr,Fr)); % Prevent prey from cheating....
     if (Frmag>Frmax)
         Fr=Fr*Frmax/Frmag;
@@ -112,7 +112,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     % and determine the viscous forces on the prey
 
     amiapredator = false;
-Fy = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fy = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
     Fymag = sqrt(dot(Fy,Fy)); % Prevent prey from cheating....
     if (Fymag>Fymax)
         Fy=Fy*Fymax/Fymag;
@@ -213,7 +213,7 @@ function [continue_running,initial_w,start_time] = handle_event(event_time,event
 end
     
 %% CHANGE THE NAME OF THE FUNCTION TO A UNIQUE GROUP NAME BEFORE SUBMITTING    
-function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
+function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
 
 
 % PLEASE FILL OUT THE INFORMATION BELOW WHEN YOU SUBMIT YOUR CODE
@@ -248,27 +248,26 @@ function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
 
-  %
-  if (amiapredator)
+    if (amiapredator)
     % Code to compute the force to be applied to the predator
- %R= c/p(r)
-   dt= 8;
-   if (norm(py-pr) < 15)
-        dt = 2;
-   end
+    %R= c/p(r)
+        dt= 8;
+        if (norm(py-pr) < 15)
+            dt = 2;
+        end
 %     if (t<5)
 %         F= Fymax*[0;1];
- F= py+dt*vy - (pr+dt*vr);
- F= Frmax*F/norm(F);
+    F= py+dt*vy - (pr+dt*vr);
+    F= Frmax*F/norm(F);
  
-  else
+    else
     % Code to compute the force to be applied to the prey
-     if (t<5)
-    F = Fymax*[0;1];
-      end
-F=[sin(t); 2 + cos(t)];
-F= Fymax*F/norm(F);
-   end
+        if (t<5)
+            F = Fymax*[0;1];
+        end
+        F=[sin(t); 2 + cos(t)];
+        F= Fymax*F/norm(F);
+    end
   
 end
 %%
