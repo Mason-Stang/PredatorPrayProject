@@ -2,7 +2,6 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
-%comment added
 
 function predator_prey
 
@@ -230,6 +229,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
   %
   if (amiapredator)
     % Code to compute the force to be applied to the predator
+    
 
  
   else
@@ -239,6 +239,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
    end
   
 end
+
 %%
 function F = compute_random_force(t,force_table)
 % Computes value of fluctuating random force at time t, where 0<t<250.
