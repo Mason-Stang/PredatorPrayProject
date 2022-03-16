@@ -2,6 +2,10 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
+<<<<<<< HEAD
+=======
+% keller is cool
+>>>>>>> 720022805d4a03c43313a4d5759b54734bcff651
 
 function predator_prey
 
@@ -84,7 +88,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
 
     % Compute all the forces on the predator
     amiapredator = true;
-    Fr = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fr = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
     Frmag = sqrt(dot(Fr,Fr)); % Prevent prey from cheating....
     if (Frmag>Frmax)
         Fr=Fr*Frmax/Frmag;
@@ -104,13 +108,34 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dErdt = -Eburnrate_r*norm(Fr)^(3/2);
+    dErdt= 0;
 
     % Write similar code below to call your compute_f_groupname function to
     % compute the force on the prey, determine the random forces on the prey,
     % and determine the viscous forces on the prey
 
     amiapredator = false;
+    Fy = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fymag = sqrt(dot(Fy,Fy)); % Prevent prey from cheating....
+    if (Fymag>Fymax)
+        Fy=Fy*Fymax/Fymag;
+    end
+    if (Ey<=0)  % Out of fuel!
+        Fy = [0;0];
+    end
 
+    Fyrand = Fyrand_magnitude*compute_random_force(t,force_table_prey); % Random force on predator
+    Fyvisc = -norm(vy)*vy*c;   % Drag force on predator
+    Fygrav = -my*g*[0;1];      % Gravity force on predator
+    Fytotal = Fy+Fyrand+Fyvisc+Fygrav;  % Total force on predator
+
+    %       If predator is on ground and stationary, and resultant vertical force < 0, set force on predator to zero
+    if (py(2)<=0 && vy(2)<=0 && Fytotal(2)<0)
+        Fytotal = [0;0];
+    end
+
+    dEydt = -Eburnrate_y*norm(Fy)^(3/2);
+    dEydt = 0;
 
     dwdt = [vr;vy;Frtotal/mr;Fytotal/my;dErdt;dEydt];
 
@@ -226,17 +251,31 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
 
-  %
-  if (amiapredator)
+    if (amiapredator)
     % Code to compute the force to be applied to the predator
+<<<<<<< HEAD
     
 
+=======
+    %R= c/p(r)
+        dt= 8;
+        if (norm(py-pr) < 15)
+            dt = 2;
+        end
+%     if (t<5)
+%         F= Fymax*[0;1];
+    F= py+dt*vy - (pr+dt*vr);
+    F= Frmax*F/norm(F);
+>>>>>>> 720022805d4a03c43313a4d5759b54734bcff651
  
-  else
+    else
     % Code to compute the force to be applied to the prey
-
- 
-   end
+        if (t<5)
+            F = Fymax*[0;1];
+        end
+        F=[sin(t); 2 + cos(t)];
+        F= Fymax*F/norm(F);
+    end
   
 end
 
