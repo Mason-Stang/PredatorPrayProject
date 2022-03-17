@@ -261,7 +261,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     if (((1*Er) < 100000) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
 
-        h = abs(((predator_crash_limit - 14)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+        h = abs(((predator_crash_limit - 10)^2 - vry^2/(2*((Frmax/mr)-9.81))));
         
         % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
         if ((vry <= 0) && (pry <= h))   %needs max upward force to not reach crash limit
@@ -307,17 +307,18 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
  
     else
     % Code to compute the force to be applied to the prey
-     if (((1*Ey) < 0.2*Max_fuel_y) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
+        if (((1*Ey) < 0.4*Max_fuel_y) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
-
-        h = abs(((predator_crash_limit - 14)^2 - vyy^2/(2*((Fymax/my)-9.81))));
+        
+        h = 2*abs(((prey_crash_limit - 6)^2 - vyy^2/(2*((Fymax/my)-9.81))));
         
         % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
         if ((vyy <= 0) && (pyy <= h))   %needs max upward force to not reach crash limit
             F = [0;1];
             F = Fymax*F/norm(F);
         else
-            F = [0; cos(t)];
+            F = [0.1 * cos(t); -0.5];
+            F= Fymax*F/norm(F);
         end
     else
         if (t<5)
