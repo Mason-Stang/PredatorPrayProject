@@ -1,9 +1,9 @@
+%Mason's prey code that breaks predator
+
+
 % This is a basic predator-prey script that is intended to show
 % how to organize a test code.
 % The predator and prey strategies are very basic.
-
-
-% keller is cool
 
 
 function predator_prey
@@ -379,14 +379,6 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         end
         end
     end
-
-
-    %Add ground avoidance. Think about start of flight
-    %Refueling
-        %Use kinematics to calculate time to ground. Use
-        %That to determine if it has to begin refueling.
-        %If yes, refuel...
-  
 end
 
 %%
