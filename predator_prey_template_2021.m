@@ -274,6 +274,10 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
     %R= c/p(r)
     else
+        if (t<10)
+            F=Frmax*[0;1];
+            F=Frmax*F/norm(F);
+        else
         
         dist = norm(py-pr);
         switch dist
@@ -291,14 +295,16 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
                 dt = 1;
         end
         
+        
 %         dt= 4;
 %         if (norm(py-pr) < 15)
 %             dt = 2;
 %         end
 
-        F= py+dt*vy - (pr+dt*vr); %put this back in!
-        %F = py-pr;
+        F= py+dt*vy - (pr+dt*vr); %Add gravity!
         F= Frmax*F/norm(F);
+
+        end
 
     end
 
