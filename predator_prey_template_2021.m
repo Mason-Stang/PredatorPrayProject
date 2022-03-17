@@ -278,10 +278,10 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         F = Frmax*F/norm(F);
 
     else
-        if (t<40)
-            F=Frmax*[0;1];
-            F=Frmax*F/norm(F);
-        else
+%         if (t<40)
+%             F=Frmax*[0;1];
+%             F=Frmax*F/norm(F);
+%         else
         
         dist = norm(py-pr);
         switch dist
@@ -296,9 +296,9 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
             case dist > 50
                 dt = 2;
             otherwise
-                dt = 1;
+                dt = 10;
                 %add more switch cases
-        end
+        %end
         
         
 %         dt= 4;
@@ -309,6 +309,9 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         F= py+dt*vy - (pr+dt*vr); 
         %F = F/norm(F);
         %F = F*(1-(mr*g)/Frmax) + [0;(mr*g)/Frmax]; %Added gravity!
+        if (pry < 50)
+            F = [0;1];
+        end
         F= Frmax*F/norm(F);
 
         end
@@ -339,7 +342,9 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         end
     elseif (t<5) %If start of flight
             F = Fymax*[0;1]; 
-
+    elseif (pyy < 50)
+        F = [0; 1];
+        F = Fymax*F/norm(F);
     elseif ((vyy <= 0) && (pyy <= gndVal)) %ground avoidance! 
             F = [0;1];
             F = Fymax*F/norm(F);
@@ -390,12 +395,12 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
             vecFinal = vecFinal/norm(vecFinal);
             vecFinal = vecFinal*(1-(my*g)/Fymax) + [0;(my*g)/Fymax]; %incorperating gravity
             vecFinal = vecFinal/norm(vecFinal);
-            if (dist < 300)
-                vecFinal = vecFinal + [0;-2]; %so it goes down when possible.
+            if (dist > 300)
+                vecFinal = vecFinal .* [1;-1]; %so it goes down when possible.
             end
             F = Fymax*(vecFinal/norm(vecFinal));
-        end
-        end
+    end
+    end
 end
 
 
@@ -458,6 +463,3 @@ for i = 1:length(t)
     pause(0.1);
 end
 end
-
-
-
