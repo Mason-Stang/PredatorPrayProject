@@ -257,6 +257,8 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     if (amiapredator)
     % Code to compute the force to be applied to the predator
     
+    gndVal = 2*abs(((0)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+
     %Refueling code. Adjust and reuse for prey.
     if (((1*Er) < 100000) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
@@ -270,9 +272,11 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         else
             F = [0; 0];
         end
+    
+    elseif ((vry <= 0) && (pry <= gndVal)) %ground avoidance! 
+        F = [0;1];
+        F = Frmax*F/norm(F);
 
-
-    %R= c/p(r)
     else
         if (t<40)
             F=Frmax*[0;1];
@@ -293,6 +297,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
                 dt = 2;
             otherwise
                 dt = 1;
+                %add more switch cases
         end
         
         
@@ -316,9 +321,11 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
     else   %prey starts here =============================================
 
+        dist = norm(py-pr);
+        gndVal = 2*abs(((0)^2 - vyy^2/(2*((Fymax/my)-9.81))));
     % Code to compute the force to be applied to the prey
-        if (((1*Ey) < 0.4*Max_fuel_y) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
-        %could have 1*Er - 1*pry
+    if (((1*Ey) < 0.4*Max_fuel_y)) %Need to refuel. 
+        % && (5 < norm(py-pr))
         
         h = 2*abs(((prey_crash_limit - 6)^2 - vyy^2/(2*((Fymax/my)-9.81))));
         
@@ -330,20 +337,14 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
             F = [0.1 * cos(t); -0.5];
             F= Fymax*F/norm(F);
         end
-    else
-        if (t<5)
-            F = Fymax*[0;1]; %For start of flight
-        else
+    elseif (t<5) %If start of flight
+            F = Fymax*[0;1]; 
 
-            %old
-            %F=[5*sin(t) + cos(t); 10 + cos(t)]; 
-            %Pretty good: F=[sin(t); 1.1 + cos(t)];
-            %F= Fymax*F/norm(F);
+    elseif ((vyy <= 0) && (pyy <= gndVal)) %ground avoidance! 
+            F = [0;1];
+            F = Fymax*F/norm(F);
+    else  %if nothing else applies
 
-
-
-    
-             dist = norm(py-pr);
 %             switch dist
 %                 case dist > 400
 %                     dt = 10;
@@ -370,8 +371,14 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     
             vecReal = vecNormal1;
             pyy = py(2);
-            if (pyy < 100) 
+            if (pyy < 100) %if close to ground
                 if (vecNormal1(2) >= 0)
+                    vecReal = vecNormal1;
+                else
+                    vecReal = vecNormal2;
+                end
+            elseif (pyy > 500) %if far from ground
+                if (vecNormal1(2) <= 0)
                     vecReal = vecNormal1;
                 else
                     vecReal = vecNormal2;
@@ -381,13 +388,19 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
             weight = dist;
             vecFinal = 100*vecReal + weight*vecAway; %+ [0;1000];
             vecFinal = vecFinal/norm(vecFinal);
-            vecFinal = vecFinal*(1-(my*g)/Fymax) + [0;(my*g)/Fymax]; %incorperated gravity
+            vecFinal = vecFinal*(1-(my*g)/Fymax) + [0;(my*g)/Fymax]; %incorperating gravity
             vecFinal = vecFinal/norm(vecFinal);
+            if (dist < 300)
+                vecFinal = vecFinal + [0;-2]; %so it goes down when possible.
+            end
             F = Fymax*(vecFinal/norm(vecFinal));
         end
         end
-    end
 end
+
+
+%=========================================================================
+
 
 %%
 function F = compute_random_force(t,force_table)
