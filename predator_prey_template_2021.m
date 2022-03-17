@@ -251,10 +251,13 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     Max_fuel_y = 50000;  % Max stored energy for prey
     prx = pr(1);
     pry = pr(2);
+    vrx = vr(1);
     vry = vr(2);
     pyx = py(1);
     pyy = py(2);
+    vyx = vy(1);
     vyy = vy(2);
+    c = 0.2;
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
@@ -265,14 +268,29 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     if (((1*Er) < 100000) && (2 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
 
-        h = abs(((predator_crash_limit - 13)^2 - vry^2/(2*((Frmax/mr)-g))));
+        h = 2*abs(((predator_crash_limit - 13)^2 - vry^2/(2*((Frmax/mr)-g))));
         
         % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
         if ((vry <= 0) && (pry <= h))   %needs max upward force to not reach crash limit
-            F = [0;1];
+            if (vrx < 0)
+                fx = norm(vr)*vrx*c;
+            else
+                fx = -norm(vr)*vrx*c;
+            end
+            F = [fx;Frmax];
             F = Frmax*F/norm(F);
         else
-            F = [0; 0];
+            if (norm(vr) < -10)
+                if (vrx < 0)
+                    fx = norm(vr)*vrx*c;
+                else
+                    fx = -norm(vr)*vrx*c;
+                end
+                F = [fx;Frmax];
+                F = Frmax*F/norm(F);
+            else
+                F = [0; 0];
+            end
         end
     
     elseif ((vry <= 0) && (pry <= gndVal)) %ground avoidance! 
@@ -345,7 +363,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         
         % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
         if ((vyy <= 0) && (pyy <= h))   %needs max upward force to not reach crash limit
-            F = [0;1];
+            F = [-norm(vy)*vyx*c;Fymax];
             F = Fymax*F/norm(F);
         else
             F = [0.1 * cos(t); -0.5];
@@ -359,24 +377,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     elseif ((vyy <= 0) && (pyy <= gndVal)) %ground avoidance! 
             F = [0;1];
             F = Fymax*F/norm(F);
-    else  %if nothing else applies
-
-%             switch dist
-%                 case dist > 400
-%                     dt = 10;
-%                 case dist > 300
-%                     dt = 8;
-%                 case dist > 200
-%                     dt = 5;
-%                 case dist > 100
-%                     dt = 3;
-%                 case dist > 50
-%                     dt = 2;
-%                 otherwise
-%                     dt = 1;
-%             end
-%             vecAway = (py+dt*vy - (pr+dt*vr)); 
-
+    else
             vecAway = py-pr; 
             vecAway = vecAway/norm(vecAway);
     
