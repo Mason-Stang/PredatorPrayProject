@@ -249,21 +249,23 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     prey_crash_limit = 8; % Prey max landing speed to survive
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
+    prx = pr(1);
     pry = pr(2);
     vry = vr(2);
+    pyx = py(1);
     pyy = py(2);
     vyy = vy(2);
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
     
-    gndVal = 2*abs(((0)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+    gndVal = 2*abs(((0)^2 - vry^2/(2*((Frmax/mr)-g))));
 
     %Refueling code. Adjust and reuse for prey.
-    if (((1*Er) < 100000) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
+    if (((1*Er) < 100000) && (2 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
 
-        h = abs(((predator_crash_limit - 10)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+        h = abs(((predator_crash_limit - 13)^2 - vry^2/(2*((Frmax/mr)-g))));
         
         % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
         if ((vry <= 0) && (pry <= h))   %needs max upward force to not reach crash limit
@@ -286,21 +288,30 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         dist = norm(py-pr);
         switch dist
             case dist > 400
-                dt = 10;
-            case dist > 300
                 dt = 8;
+            case dist > 300
+                dt = 7;
             case dist > 200
-                dt = 5;
+                dt = 6;
             case dist > 100
-                dt = 3;
+                dt = 5;
             case dist > 50
+                dt = 4;
+            case dist > 40
+                dt = 3;
+            case dist > 30
                 dt = 2;
+            case dist > 20
+                dt = 1;
+            case dist > 10
+                dt = 0.5;
+            case dist > 5
+                dt = 0.2;
             otherwise
-                dt = 10;
+                dt = 5;
                 %add more switch cases
         %end
-        
-        
+                
 %         dt= 4;
 %         if (norm(py-pr) < 15)
 %             dt = 2;
@@ -309,7 +320,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         F= py+dt*vy - (pr+dt*vr); 
         %F = F/norm(F);
         %F = F*(1-(mr*g)/Frmax) + [0;(mr*g)/Frmax]; %Added gravity!
-        if (pry < 50)
+        if ((pry < 250) && ((pry <= pyy) || (5 > abs(pry-pyy))))
             F = [0;1];
         end
         F= Frmax*F/norm(F);
@@ -369,8 +380,8 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
             vecAway = py-pr; 
             vecAway = vecAway/norm(vecAway);
     
-            vecNormal1 = [1/vecAway(1);-1/vecAway(2)];
-            vecNormal2 = [-1/vecAway(1);1/vecAway(2)];
+            vecNormal1 = [-vecAway(2);vecAway(1)];
+            vecNormal2 = [vecAway(2);-vecAway(1)];
             vecNormal1 = vecNormal1/norm(vecNormal1);
             vecNormal2 = vecNormal2/norm(vecNormal2);
     
@@ -392,11 +403,14 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     
             weight = dist;
             vecFinal = 100*vecReal + weight*vecAway; %+ [0;1000];
-            vecFinal = vecFinal/norm(vecFinal);
+            %vecFinal = vecFinal/norm(vecFinal);
             vecFinal = vecFinal*(1-(my*g)/Fymax) + [0;(my*g)/Fymax]; %incorperating gravity
             vecFinal = vecFinal/norm(vecFinal);
-            if (dist > 300)
+            if (dist > 100)
                 vecFinal = vecFinal .* [1;-1]; %so it goes down when possible.
+            end
+            if (dist < 20)
+                vecFinal = [10*sin(t);-5*cos(t)];
             end
             F = Fymax*(vecFinal/norm(vecFinal));
     end
