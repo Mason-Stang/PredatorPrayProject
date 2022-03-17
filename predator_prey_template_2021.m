@@ -278,17 +278,17 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         dist = norm(py-pr);
         switch dist
             case dist > 400
-                dt = 2;
+                dt = 10;
             case dist > 300
-                dt = 1;
+                dt = 8;
             case dist > 200
-                dt = 0.5;
+                dt = 5;
             case dist > 100
-                dt = 0.25;
+                dt = 3;
             case dist > 50
-                dt = 0.1;
+                dt = 2;
             otherwise
-                dt = 0.05;
+                dt = 1;
         end
         
 %         dt= 4;
