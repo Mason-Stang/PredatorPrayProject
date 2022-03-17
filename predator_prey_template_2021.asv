@@ -274,6 +274,10 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
     %R= c/p(r)
     else
+        if (t<10)
+            F=Frmax*[0;1];
+            F=Frmax*F/norm(F);
+        else
         
         dist = norm(py-pr);
         switch dist
@@ -291,14 +295,18 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
                 dt = 1;
         end
         
+        
 %         dt= 4;
 %         if (norm(py-pr) < 15)
 %             dt = 2;
 %         end
 
-        F= py+dt*vy - (pr+dt*vr); %put this back in!
-        %F = py-pr;
+        F= py+dt*vy - (pr+dt*vr); %Add gravity!
+        F = F*()
+        %vecFinal = vecFinal*(1-(my*g)/Fymax) + [0;(my*g)/Fymax]; %incorperated gravity
         F= Frmax*F/norm(F);
+
+        end
 
     end
 
@@ -379,14 +387,6 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         end
         end
     end
-
-
-    %Add ground avoidance. Think about start of flight
-    %Refueling
-        %Use kinematics to calculate time to ground. Use
-        %That to determine if it has to begin refueling.
-        %If yes, refuel...
-  
 end
 
 %%

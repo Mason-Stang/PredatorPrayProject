@@ -274,7 +274,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 
     %R= c/p(r)
     else
-        if (t<10)
+        if (t<40)
             F=Frmax*[0;1];
             F=Frmax*F/norm(F);
         else
@@ -301,7 +301,9 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
 %             dt = 2;
 %         end
 
-        F= py+dt*vy - (pr+dt*vr); %Add gravity!
+        F= py+dt*vy - (pr+dt*vr); 
+        %F = F/norm(F);
+        %F = F*(1-(mr*g)/Frmax) + [0;(mr*g)/Frmax]; %Added gravity!
         F= Frmax*F/norm(F);
 
         end
