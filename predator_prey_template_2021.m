@@ -256,27 +256,46 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     % Code to compute the force to be applied to the predator
 
     %Refueling code. Adjust and reuse for prey.
-    if ((1*Er) < 100000) %Need to refuel. Adjust constant
+    if (((1*Er) < 100000) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
-        if ((vry < 0) & ((predator_crash_limit-15) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry)) & ...
-                (0 < (vry^2 + -2*(Frmax/mr)*pry)))   %needs max upward force to not reach crash limit
+
+        h = abs(((predator_crash_limit - 14)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+        
+        % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
+        if ((vry <= 0) && (pry <= h))   %needs max upward force to not reach crash limit
             F = [0;1];
             F = Frmax*F/norm(F);
-        else 
-            F = Frmax*[0; -1];
+        else
+            F = [0; 0];
         end
 
 
     %R= c/p(r)
     else
-
-        dt= 8;
-        if (norm(py-pr) < 15)
-            dt = 2;
+        
+        dist = norm(py-pr);
+        switch dist
+            case dist > 400
+                dt = 2;
+            case dist > 300
+                dt = 1;
+            case dist > 200
+                dt = 0.5;
+            case dist > 100
+                dt = 0.25;
+            case dist > 50
+                dt = 0.1;
+            otherwise
+                dt = 0.05;
         end
+        
+%         dt= 4;
+%         if (norm(py-pr) < 15)
+%             dt = 2;
+%         end
 
-        %F= py+dt*vy - (pr+dt*vr); put this back in!
-        F = py-pr;
+        F= py+dt*vy - (pr+dt*vr); %put this back in!
+        %F = py-pr;
         F= Frmax*F/norm(F);
 
     end
@@ -289,7 +308,7 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
         if (t<5)
             F = Fymax*[0;1]; %For start of flight
         end
-        F=[sin(t); 2 + cos(t)]; 
+        F=[5*sin(t) + cos(t); 10 + cos(t)]; 
         %Pretty good: F=[sin(t); 1.1 + cos(t)];
         F= Fymax*F/norm(F);
     end

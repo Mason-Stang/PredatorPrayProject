@@ -107,7 +107,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dErdt = -Eburnrate_r*norm(Fr)^(3/2);
-    dErdt= 0;
+    %dErdt= 0;
 
     % Write similar code below to call your compute_f_groupname function to
     % compute the force on the prey, determine the random forces on the prey,
@@ -134,7 +134,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dEydt = -Eburnrate_y*norm(Fy)^(3/2);
-    dEydt = 0;
+    %dEydt = 0;
 
     dwdt = [vr;vy;Frtotal/mr;Fytotal/my;dErdt;dEydt];
 
@@ -249,32 +249,56 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     prey_crash_limit = 8; % Prey max landing speed to survive
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
-    [prx, pry] = pr;
-    [vrx, vry] = vr;
+    pry = pr(2);
+    vry = vr(2);
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
 
     %Refueling code. Adjust and reuse for prey.
-    if ((1*Er - 1*pry) < 50000) %Need to refuel. Adjust constant
-        if ((pry < 0) && ((predator_crash_limit-2) < sqrt(Vry^2 + 2*(Frmax/mr)*pry)))   %needs max upward force to not reach crash limit
-            F = Frmax*[0;1]; %For start of flight
-        else 
-            F = F = Frmax*[0; -1];
+    if (((1*Er) < 100000) && (10 < (py-pr))) %Need to refuel. Adjust constant
+        %could have 1*Er - 1*pry
+
+        h = abs(((predator_crash_limit - 13)^2 - vry^2/(2*((Frmax/mr)-9.81))));
+        
+        % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
+        if ((vry <= 0) && (pry <= h))   %needs max upward force to not reach crash limit
+            %h
+            %vry
+            F = [0;1];
+            F = Frmax*F/norm(F);
+        else
+            F = [0; 0];
         end
 
-    end
 
     %R= c/p(r)
-        dt= 8;
+    else
+        
+        dist = norm(py-pr);
+        switch dist
+            case dist > 400
+                dt = 6;
+            case dist > 300
+                dt = 5;
+            case dist > 200
+                dt = 3;
+            case dist > 100
+                dt = 2;
+            case dist
+        end
+        
+        dt= 4;
         if (norm(py-pr) < 15)
             dt = 2;
         end
 
-%     if (t<5)
-%         F= Fymax*[0;1];
-    F= py+dt*vy - (pr+dt*vr);
-    F= Frmax*F/norm(F);
+        F= py+dt*vy - (pr+dt*vr); %put this back in!
+        %F = py-pr;
+        F= Frmax*F/norm(F);
+
+    end
+
 
     %Why does predator pause?
  
@@ -303,7 +327,7 @@ function F = compute_random_force(t,force_table)
 % The variable force_table is a 251x2 matrix of pseudo-random
 % numbers between -0.5 and 0.5, computed using
 % force_table = rand(251,2)-0.5;
-% The force is in Newtons  if you use another system of units you
+% The force is in Newtons – if you use another system of units you
 % must convert.
 F = [interp1([0:5:250],force_table(:,1),t);interp1([0:5:250],force_table(:,2),t)];
 end
