@@ -251,10 +251,12 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     Max_fuel_y = 50000;  % Max stored energy for prey
     pry = pr(2);
     vry = vr(2);
+    pyy = py(2);
+    vyy = vy(2);
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
-
+    
     %Refueling code. Adjust and reuse for prey.
     if (((1*Er) < 100000) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
         %could have 1*Er - 1*pry
@@ -305,12 +307,28 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
  
     else
     % Code to compute the force to be applied to the prey
+     if (((1*Ey) < 0.2*Max_fuel_y) && (10 < norm(py-pr))) %Need to refuel. Adjust constant
+        %could have 1*Er - 1*pry
+
+        h = abs(((predator_crash_limit - 14)^2 - vyy^2/(2*((Fymax/my)-9.81))));
+        
+        % (predator_crash_limit-5) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry))
+        if ((vyy <= 0) && (pyy <= h))   %needs max upward force to not reach crash limit
+            F = [0;1];
+            F = Fymax*F/norm(F);
+        else
+            F = [0; cos(t)];
+        end
+    else
         if (t<5)
             F = Fymax*[0;1]; %For start of flight
-        end
+        else
         F=[5*sin(t) + cos(t); 10 + cos(t)]; 
         %Pretty good: F=[sin(t); 1.1 + cos(t)];
         F= Fymax*F/norm(F);
+        end
+    end
+       
     end
 
 
