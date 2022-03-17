@@ -107,7 +107,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dErdt = -Eburnrate_r*norm(Fr)^(3/2);
-    dErdt= 0;
+    %dErdt= 0;
 
     % Write similar code below to call your compute_f_groupname function to
     % compute the force on the prey, determine the random forces on the prey,
@@ -134,7 +134,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     end
 
     dEydt = -Eburnrate_y*norm(Fy)^(3/2);
-    dEydt = 0;
+    %dEydt = 0;
 
     dwdt = [vr;vy;Frtotal/mr;Fytotal/my;dErdt;dEydt];
 
@@ -249,29 +249,57 @@ function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy
     prey_crash_limit = 8; % Prey max landing speed to survive
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
+    pry = pr(2);
+    vry = vr(2);
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
 
+    %Refueling code. Adjust and reuse for prey.
+    if ((1*Er) < 100000) %Need to refuel. Adjust constant
+        %could have 1*Er - 1*pry
+        if ((vry < 0) & ((predator_crash_limit-15) < norm(vry^2 + -2*((Frmax-9.8)/mr)*pry)) & ...
+                (0 < (vry^2 + -2*(Frmax/mr)*pry)))   %needs max upward force to not reach crash limit
+            F = [0;1];
+            F = Frmax*F/norm(F);
+        else 
+            F = Frmax*[0; -1];
+        end
+
+
     %R= c/p(r)
+    else
+
         dt= 8;
         if (norm(py-pr) < 15)
             dt = 2;
         end
-%     if (t<5)
-%         F= Fymax*[0;1];
-    F= py+dt*vy - (pr+dt*vr);
-    F= Frmax*F/norm(F);
 
+        %F= py+dt*vy - (pr+dt*vr); put this back in!
+        F = py-pr;
+        F= Frmax*F/norm(F);
+
+    end
+
+
+    %Why does predator pause?
  
     else
     % Code to compute the force to be applied to the prey
         if (t<5)
-            F = Fymax*[0;1];
+            F = Fymax*[0;1]; %For start of flight
         end
-        F=[sin(t); 2 + cos(t)];
+        F=[sin(t); 2 + cos(t)]; 
+        %Pretty good: F=[sin(t); 1.1 + cos(t)];
         F= Fymax*F/norm(F);
     end
+
+
+    %Add ground avoidance. Think about start of flight
+    %Refueling
+        %Use kinematics to calculate time to ground. Use
+        %That to determine if it has to begin refueling.
+        %If yes, refuel...
   
 end
 

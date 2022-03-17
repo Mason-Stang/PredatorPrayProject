@@ -2,7 +2,9 @@
 % how to organize a test code.
 % The predator and prey strategies are very basic.
 
+
 % keller is cool
+
 
 function predator_prey
 
@@ -85,7 +87,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
 
     % Compute all the forces on the predator
     amiapredator = true;
-    Fr = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fr = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
     Frmag = sqrt(dot(Fr,Fr)); % Prevent prey from cheating....
     if (Frmag>Frmax)
         Fr=Fr*Frmax/Frmag;
@@ -112,7 +114,7 @@ function dwdt = eom(t,w,force_table_predator,force_table_prey)
     % and determine the viscous forces on the prey
 
     amiapredator = false;
-Fy = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
+    Fy = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey);
     Fymag = sqrt(dot(Fy,Fy)); % Prevent prey from cheating....
     if (Fymag>Fymax)
         Fy=Fy*Fymax/Fymag;
@@ -213,12 +215,12 @@ function [continue_running,initial_w,start_time] = handle_event(event_time,event
 end
     
 %% CHANGE THE NAME OF THE FUNCTION TO A UNIQUE GROUP NAME BEFORE SUBMITTING    
-function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
+function F = compute_f_stangandfriends(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
 
 
 % PLEASE FILL OUT THE INFORMATION BELOW WHEN YOU SUBMIT YOUR CODE
 % Test time and place: Enter the time and room for your test here 
-% Group members: list the names of your group members here
+% Group members: Mason, Austin, Andrew, keller
 
 
 %   t: Time
@@ -247,36 +249,61 @@ function F = compute_f_mygroupname(t,Frmax,Fymax,amiapredator,pr,vr,Er,py,vy,Ey)
     prey_crash_limit = 8; % Prey max landing speed to survive
     Max_fuel_r = 500000; % Max stored energy for predator
     Max_fuel_y = 50000;  % Max stored energy for prey
+    [prx, pry] = pr;
+    [vrx, vry] = vr;
 
     if (amiapredator)
     % Code to compute the force to be applied to the predator
+
+    %Refueling code. Adjust and reuse for prey.
+    if ((1*Er - 1*pry) < 50000) %Need to refuel. Adjust constant
+        if ((pry < 0) && ((predator_crash_limit-2) < sqrt(Vry^2 + 2*(Frmax/mr)*pry)))   %needs max upward force to not reach crash limit
+            F = Frmax*[0;1]; %For start of flight
+        else 
+            F = F = Frmax*[0; -1];
+        end
+
+    end
+
     %R= c/p(r)
         dt= 8;
         if (norm(py-pr) < 15)
             dt = 2;
         end
+
 %     if (t<5)
 %         F= Fymax*[0;1];
     F= py+dt*vy - (pr+dt*vr);
     F= Frmax*F/norm(F);
+
+    %Why does predator pause?
  
     else
     % Code to compute the force to be applied to the prey
         if (t<5)
-            F = Fymax*[0;1];
+            F = Fymax*[0;1]; %For start of flight
         end
-        F=[sin(t); 2 + cos(t)];
+        F=[sin(t); 2 + cos(t)]; 
+        %Pretty good: F=[sin(t); 1.1 + cos(t)];
         F= Fymax*F/norm(F);
     end
+
+
+    %Add ground avoidance. Think about start of flight
+    %Refueling
+        %Use kinematics to calculate time to ground. Use
+        %That to determine if it has to begin refueling.
+        %If yes, refuel...
   
 end
+
 %%
 function F = compute_random_force(t,force_table)
 % Computes value of fluctuating random force at time t, where 0<t<250.
 % The variable force_table is a 251x2 matrix of pseudo-random
 % numbers between -0.5 and 0.5, computed using
 % force_table = rand(251,2)-0.5;
-% The force is in Newtons – if you use another system of units you
+% The force is in Newtons  if you use another system of units you
 % must convert.
 F = [interp1([0:5:250],force_table(:,1),t);interp1([0:5:250],force_table(:,2),t)];
 end
